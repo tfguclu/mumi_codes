@@ -156,10 +156,11 @@ outputPressure      1000
 
     return
 
+global step_size
+step_size = 5000
+
 for file in os.listdir('.'):
-    if fnmatch.fnmatch(file, '*.pdb'):
+    if fnmatch.fnmatch(file, 'protein_res*_mutated_wb_autopsf.pdb'):
         pdb = file
+        config_gen(str(pdb),str(step_size))
 
-step_size = 30000
-
-config_gen(str(pdb),str(step_size))
