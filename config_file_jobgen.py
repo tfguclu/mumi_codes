@@ -24,7 +24,7 @@ for i in range(range_list):
     conffile = str(file_names_sorted[i] +".conf")
     logfile = str(file_names_sorted[i] +".log")
     f.write("namd2 +p8 %s > %s\n" % (str(conffile), str(logfile)))
-    f.write("echo job for %s is finished\n" % str(config))
+    f.write("echo job for %s is finished\n" % str(conffile))
 
 f.write("all jobs are finished")
 f.close()
