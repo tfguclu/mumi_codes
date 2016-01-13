@@ -11,13 +11,20 @@ f = open("config_joblist", 'w')
 
 f.write("#!/bin/bash\n")
 f.write("echo config jobs started\n")
-
+file_names_sorted = []
 for file in os.listdir('.'):
     if fnmatch.fnmatch(file, '*_config.conf'):
-        config = file
-        file_name_wh_ex = str(os.path.splitext(config)[0])
-        logfile = str(file_name_wh_ex+".log")
-        f.write("namd2 +p8 %s > %s\n" % (str(config), str(logfile)))
-        f.write("echo job for %s is finished\n" % str(config))
+        file_name_wh_ex = str(os.path.splitext(file)[0])
+        file_names_sorted.append(file_name_wh_ex)
+        file_names_sorted = sorted(file_names_sorted, key=str.lower)
 
+range_list = len(file_names_sorted)
+
+for i in range(range_list):
+    conffile = str(file_names_sorted[i] +".conf")
+    logfile = str(file_names_sorted[i] +".log")
+    f.write("namd2 +p8 %s > %s\n" % (str(conffile), str(logfile)))
+    f.write("echo job for %s is finished\n" % str(config))
+
+f.write("all jobs are finished")
 f.close()
