@@ -26,5 +26,5 @@ for i in range(range_list):
     f.write("namd2 +p8 %s > %s\n" % (str(conffile), str(logfile)))
     f.write("echo job for %s is finished\n" % str(conffile))
 
-f.write("all jobs are finished")
+f.write(" echo all jobs are finished")
 f.close()
