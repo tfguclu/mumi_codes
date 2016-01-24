@@ -75,6 +75,8 @@ langevinHydrogen    off    ;# don't couple langevin bath to hydrogens
     f.write("\n")
     f.write("\n")
 
+    # TODO: Create a class, please :ç
+
     ###################
     pdb_atom_coords = structure.getCoords()
     xmax = np.max(pdb_atom_coords[:, 0])
