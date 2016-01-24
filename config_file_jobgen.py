@@ -14,9 +14,9 @@ f.write("echo config jobs started\n")
 file_names_sorted = []
 for file in os.listdir('.'):
     if fnmatch.fnmatch(file, '*_config.conf'):
-        file_name_wh_ex = str(os.path.splitext(file)[0])
-        file_names_sorted.append(file_name_wh_ex)
-        file_names_sorted = sorted(file_names_sorted, key=str.lower)
+        file_names_sorted.append(str(os.path.splitext(file)[0])) # no need to create variable to append
+
+file_names_sorted = sorted(file_names_sorted, key=str.lower) # sorting should executed once
 
 range_list = len(file_names_sorted)
 
