@@ -11,13 +11,14 @@ import os
 def mutator(pdb_file):
 
     structure = parsePDB(str(pdb_file))
-    water = structure.select("water")
-    ions = structure.select("ion")
+    #water = structure.select("water")
+    #ions = structure.select("ion")
 
-    global water_box, protein
+    #global water_box, protein
+    global protein
 
-    water_box = water + ions
-    water_box = water_box.copy()
+    #water_box = water + ions
+    #water_box = water_box.copy()
 
     protein = structure.select("protein")
     protein = protein.copy()
@@ -35,8 +36,8 @@ def mutator(pdb_file):
         res_id_mut_slc = res_id_mut_slc.setResnames("ALA")
 
         mutated_protein_structure = protein_wh_res_sd.copy()
-        mutated_protein_structure_wb = mutated_protein_structure + water_box
-        mutated_protein_structure_wb = mutated_protein_structure_wb.copy()
-        writePDB("protein_res%s_mutated_wb.pdb" % str(i), mutated_protein_structure_wb)
+        #mutated_protein_structure_wb = mutated_protein_structure + water_box
+        #mutated_protein_structure_wb = mutated_protein_structure_wb.copy()
+        writePDB("protein_res%s_mutated.pdb" % str(i), mutated_protein_structure)
 
 mutator("1lit_min_last_frame.pdb")
