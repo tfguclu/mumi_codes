@@ -58,6 +58,7 @@ def graph_construct(pdb_file):
     for i in range(nodes_range):
         betwen_cent[nodes[i].getResnum()] = betwen_cent.pop(i)
     plt.plot(betwen_cent.keys(),betwen_cent.values())
+    plt.title(str(file_name_wh_ex)+"_BC.png")
     plt.savefig(str(file_name_wh_ex)+"_BC.png",dpi=300, bbox_inches='tight')
     plt.close()
 
@@ -66,6 +67,7 @@ def graph_construct(pdb_file):
         avg_len_per_node = float((dj_path_matrix[i,:].sum())/nodes_range-1)
         avg_len_per_node_list.append(float(avg_len_per_node))
     plt.plot(betwen_cent.keys(),avg_len_per_node_list)
+    plt.title(str(file_name_wh_ex)+"_L.png")
     plt.savefig(str(file_name_wh_ex)+"_L.png",dpi=300, bbox_inches='tight')
     plt.close()
 
