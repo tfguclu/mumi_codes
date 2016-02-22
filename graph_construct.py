@@ -42,6 +42,7 @@ def graph_construct(pdb_file):
             dj_path_matrix[i,j] = nx.dijkstra_path_length(protein_graph,i,j)
 
     print((dj_path_matrix/(nodes_range*(nodes_range-1))).sum())
+    np.savetxt(str(file_name_wh_ex)+"_dj_path_matrix.dat", dj_path_matrix)
 
     #for i in nodes_list:
     #    protein_graph.node[i]["residue number"] = int(nodes[i].getResnum())
@@ -52,7 +53,8 @@ def graph_construct(pdb_file):
     #print(len(all_pairs))
     #print(nx.betweenness_centrality(protein_graph, normalized=False))
     #print(nodes[dijkstra_index].getResnums())
-    #print(nodes.getResnums()[0])
+    #print(nodes.getResnums())
+    #print(nodes.getResindices())
 
     betwen_cent = nx.betweenness_centrality(protein_graph)
     for i in range(nodes_range):
