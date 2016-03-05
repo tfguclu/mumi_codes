@@ -6,6 +6,7 @@ import fnmatch
 import os
 import networkx as nx
 import matplotlib.pyplot as plt
+from natsort import natsorted
 
 
 
@@ -78,22 +79,28 @@ def nat_graph_construct(pdb_file):
     nat_bc_list = np.asarray(betwen_cent)
     nodes_length = nodes_range
 
-    return (nat_file_name_wh_ex, nat_bc_list, nat_len_per_node_list)
+    return (nodes_length, nat_file_name_wh_ex, nat_bc_list, nat_len_per_node_list)
 
 
-def graph_construct(pdb_pattern,):
+def graph_construct(nat_len_per_node_list, pdb_pattern):
 
 
-    average_lenght_list = np.zeros(nodes_length,nodes_length)
+    delta_lenght_per_node_dictionary = {}
 
-
+    file_names_sorted = []
     for file in os.listdir('.'):
         if fnmatch.fnmatch(file, str(pdb_pattern)):
-            pdb_file = file
+            file_name = file
+            file_names_sorted.append(file_name)
+    file_names_sorted = natsorted(file_names_sorted)
+    print(file_names_sorted)
+    file_range = len(file_names_sorted)
 
 
-        pdb = parsePDB(str(pdb_file))
-        file_name_wh_ex = str(os.path.splitext(pdb_file)[0])
+    for i in range(int(file_range)):
+
+        pdb = parsePDB(str(file_names_sorted[i]))
+        file_name_wh_ex = str(os.path.splitext(file_names_sorted[i])[0])
         betas_gly_alphas = pdb.select("(name CB and protein) or (name CA and resname GLY)").copy()
         nodes = betas_gly_alphas
         nodes = sortAtoms(nodes, "resnum")
@@ -125,6 +132,10 @@ def graph_construct(pdb_pattern,):
             avg_len_per_node = float((dj_path_matrix[i,:].sum())/nodes_range-1)
             avg_len_per_node_list.append(float(avg_len_per_node))
 
+        nat_len_per_node_list = np.asarray(nat_len_per_node_list)
+        avg_len_per_node_list = np.asarray(avg_len_per_node_list)
+        delta_lenght_per_node = np.absolute(np.subtract(nat_len_per_node_list, avg_len_per_node))
+
 
         betwen_cent = nx.betweenness_centrality(protein_graph, normalized=False)
         betwen_cent = list(betwen_cent.values())
@@ -153,7 +164,24 @@ def graph_construct(pdb_pattern,):
         plt.savefig(str(file_name_wh_ex)+"_path.png")
         plt.close()
 
-    return
+        delta_lenght_per_node_dictionary[str(file_name_wh_ex)] = delta_lenght_per_node
+
+    return delta_lenght_per_node_dictionary, nodes_resnum_list
 
 
-list_of_nat, file_name_of_nat = nat_graph_construct("1BE9.pdb")
+nodes_length, nat_file_name_wh_ex, nat_bc_list, nat_len_per_node_list = nat_graph_construct("1be9_wt.pdb")
+
+delta_lenght_per_node_dictionary, nodes_resnum_list = graph_construct(nat_len_per_node_list, "protein_res*_mutated_autopsf_wb_ionized_lf.pdb")
+
+delta_lenght_per_node_array = np.array(delta_lenght_per_node_dictionary.values()) 
+delta_lenght_average_per_node = np.mean(delta_lenght_per_node_array, axis=0)
+
+
+plt.plot(nodes_resnum_list, delta_lenght_average_per_node)
+plt.title("Delta L", fontsize=18)
+plt.xlabel('Residue Numbers', fontsize=16)
+plt.ylabel('$\Delta$ L', fontsize=16)
+plt.savefig("average_L.png",dpi=300, bbox_inches='tight')
+plt.close()
+
+np.savetxt("delta_lenght_per_node", delta_lenght_per_node_array)
