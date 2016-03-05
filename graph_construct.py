@@ -86,6 +86,7 @@ def graph_construct(nat_len_per_node_list, pdb_pattern):
 
 
     delta_lenght_per_node_dictionary = {}
+    avg_len_per_node_dictionary = {}
 
     file_names_sorted = []
     for file in os.listdir('.'):
@@ -132,9 +133,9 @@ def graph_construct(nat_len_per_node_list, pdb_pattern):
             avg_len_per_node = float((dj_path_matrix[i,:].sum())/nodes_range-1)
             avg_len_per_node_list.append(float(avg_len_per_node))
 
-        nat_len_per_node_list = np.asarray(nat_len_per_node_list)
-        avg_len_per_node_list = np.asarray(avg_len_per_node_list)
-        delta_lenght_per_node = np.absolute(np.subtract(nat_len_per_node_list, avg_len_per_node))
+        delta_lenght_per_node = np.zeros(int(nodes_range))
+        for i in range(nodes_range):
+            delta_lenght_per_node[i] = abs(float(nat_len_per_node_list[i])-float(avg_len_per_node_list[i]))
 
 
         betwen_cent = nx.betweenness_centrality(protein_graph, normalized=False)
@@ -165,6 +166,11 @@ def graph_construct(nat_len_per_node_list, pdb_pattern):
         plt.close()
 
         delta_lenght_per_node_dictionary[str(file_name_wh_ex)] = delta_lenght_per_node
+        avg_len_per_node_dictionary[str(file_name_wh_ex)] = avg_len_per_node_list
+
+
+    avg_len_per_node_whole_array = np.array(avg_len_per_node_dictionary.values())
+    np.savetxt("avg_len_per_node_per_mutation", avg_len_per_node_whole_array)
 
     return delta_lenght_per_node_dictionary, nodes_resnum_list
 
@@ -183,5 +189,5 @@ plt.xlabel('Residue Numbers', fontsize=16)
 plt.ylabel('$\Delta$ L', fontsize=16)
 plt.savefig("average_L.png",dpi=300, bbox_inches='tight')
 plt.close()
-
+print(nat_len_per_node_list)
 np.savetxt("delta_lenght_per_node", delta_lenght_per_node_array)
