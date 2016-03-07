@@ -88,6 +88,7 @@ def graph_construct(nat_bc_list, nat_len_per_node_list, pdb_pattern):
 
     delta_lenght_per_node_dictionary = {}
     avg_len_per_node_dictionary = {}
+    delta_betwen_cent_dictionary = {}
 
     file_names_sorted = []
     for file in os.listdir('.'):
@@ -182,11 +183,10 @@ def graph_construct(nat_bc_list, nat_len_per_node_list, pdb_pattern):
     return delta_lenght_per_node_dictionary, delta_betwen_cent_dictionary, nodes_resnum_list
 
 
-nat_bc_list, nodes_length, nat_file_name_wh_ex,\
+nodes_length, nat_file_name_wh_ex,\
 nat_bc_list, nat_len_per_node_list = nat_graph_construct("1be9_wt.pdb")
 
-delta_lenght_per_node_dictionary,\
-nodes_resnum_list = graph_construct(nat_bc_list, nat_len_per_node_list,\
+delta_lenght_per_node_dictionary, delta_betwen_cent_dictionary, nodes_resnum_list = graph_construct(nat_bc_list, nat_len_per_node_list,\
     "protein_res*_mutated_autopsf_wb_ionized_lf.pdb")
 
 delta_lenght_per_node_array = np.array(delta_lenght_per_node_dictionary.values()) 
