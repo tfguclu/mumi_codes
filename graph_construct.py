@@ -48,9 +48,10 @@ def nat_graph_construct(pdb_file):
 
 
     betwen_cent = nx.betweenness_centrality(protein_graph, normalized=False)
-    betwen_cent = list(betwen_cent.values())
+    betwen_cent = np.asarray(list(betwen_cent.values()))
     betwen_cent_norm_fac = ((int(nodes_range)-1)*int(nodes_range))/2
-    betwen_cent = [x / betwen_cent_norm_fac for x in betwen_cent]
+    for i in range(nodes_range):
+        betwen_cent[i] = (betwen_cent[i]/betwen_cent_norm_fac)
 
 
     plt.plot(nodes_resnum_list,betwen_cent)
@@ -76,13 +77,13 @@ def nat_graph_construct(pdb_file):
 
     nat_file_name_wh_ex = file_name_wh_ex
     nat_len_per_node_list = np.asarray(avg_len_per_node_list)
-    nat_bc_list = np.asarray(betwen_cent)
+    nat_bc_list = betwen_cent
     nodes_length = nodes_range
 
     return (nodes_length, nat_file_name_wh_ex, nat_bc_list, nat_len_per_node_list)
 
 
-def graph_construct(nat_len_per_node_list, pdb_pattern):
+def graph_construct(nat_bc_list, nat_len_per_node_list, pdb_pattern):
 
 
     delta_lenght_per_node_dictionary = {}
@@ -133,15 +134,20 @@ def graph_construct(nat_len_per_node_list, pdb_pattern):
             avg_len_per_node = float((dj_path_matrix[i,:].sum())/nodes_range-1)
             avg_len_per_node_list.append(float(avg_len_per_node))
 
-        delta_lenght_per_node = np.zeros(int(nodes_range))
+        delta_lenght_per_node = np.zeros(nodes_range)
         for i in range(nodes_range):
             delta_lenght_per_node[i] = abs(float(nat_len_per_node_list[i])-float(avg_len_per_node_list[i]))
 
 
         betwen_cent = nx.betweenness_centrality(protein_graph, normalized=False)
-        betwen_cent = list(betwen_cent.values())
+        betwen_cent = np.asarray(list(betwen_cent.values()))
         betwen_cent_norm_fac = ((int(nodes_range)-1)*int(nodes_range))/2
-        betwen_cent = [x / betwen_cent_norm_fac for x in betwen_cent]
+        for i in range(nodes_range):
+            betwen_cent[i] = (betwen_cent[i]/betwen_cent_norm_fac)
+
+        delta_betwen_cent = np.zeros(nodes_range)
+        for i in range(nodes_range):
+            delta_betwen_cent[i] = abs(float(nat_bc_list[i])-float(betwen_cent[i]))
 
 
         plt.plot(nodes_resnum_list,betwen_cent)
@@ -167,23 +173,27 @@ def graph_construct(nat_len_per_node_list, pdb_pattern):
 
         delta_lenght_per_node_dictionary[str(file_name_wh_ex)] = delta_lenght_per_node
         avg_len_per_node_dictionary[str(file_name_wh_ex)] = avg_len_per_node_list
+        delta_betwen_cent_dictionary[str(file_name_wh_ex)] = delta_betwen_cent
 
 
     avg_len_per_node_whole_array = np.array(avg_len_per_node_dictionary.values())
     np.savetxt("avg_len_per_node_per_mutation", avg_len_per_node_whole_array)
 
-    return delta_lenght_per_node_dictionary, nodes_resnum_list
+    return delta_lenght_per_node_dictionary, delta_betwen_cent_dictionary, nodes_resnum_list
 
 
-nodes_length, nat_file_name_wh_ex,\
+nat_bc_list, nodes_length, nat_file_name_wh_ex,\
 nat_bc_list, nat_len_per_node_list = nat_graph_construct("1be9_wt.pdb")
 
 delta_lenght_per_node_dictionary,\
-nodes_resnum_list = graph_construct(nat_len_per_node_list,\
+nodes_resnum_list = graph_construct(nat_bc_list, nat_len_per_node_list,\
     "protein_res*_mutated_autopsf_wb_ionized_lf.pdb")
 
 delta_lenght_per_node_array = np.array(delta_lenght_per_node_dictionary.values()) 
 delta_lenght_average_per_node = np.mean(delta_lenght_per_node_array, axis=0)
+
+delta_betwen_cent_array = np.array(delta_betwen_cent_dictionary.values())
+delta_betwen_cent_average_per_node = np.mean(delta_betwen_cent_array, axis=0)
 
 
 plt.plot(nodes_resnum_list, delta_lenght_average_per_node)
@@ -192,5 +202,12 @@ plt.xlabel('Residue Numbers', fontsize=16)
 plt.ylabel('$\Delta$ L', fontsize=16)
 plt.savefig("average_L.png",dpi=300, bbox_inches='tight')
 plt.close()
-print(nat_len_per_node_list)
 np.savetxt("delta_lenght_per_node", delta_lenght_per_node_array)
+
+plt.plot(nodes_resnum_list, delta_betwen_cent_average_per_node)
+plt.title("Delta BC", fontsize=18)
+plt.xlabel('Residue Numbers', fontsize=16)
+plt.ylabel('$\Delta$ BC', fontsize=16)
+plt.savefig("average_BC.png",dpi=300, bbox_inches='tight')
+plt.close()
+np.savetxt("delta_BC_per_node", delta_betwen_cent_average_per_node)
